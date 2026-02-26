@@ -1,14 +1,11 @@
 # Project Rules
 
-## ⚠️ Production Safety Rules
-- This is a PRODUCTION environment — Azure AD and GitHub org are live
+## Rules
 - Always run `--dry-run` first before any real execution
 - Always run `az account show` to verify the correct Azure tenant before any `az` command
 - Always run `gh auth status` to verify org before any `gh` command
 - Never bulk-delete resources — delete one at a time and verify
 - Test new scripts on 1 resource first before running on all
-- Never rename GitHub repos without confirming it won't break developer workflows
-- Keep all report CSVs in `reports/` folder for audit trail
 
 ## AI Behavior Rules
 - Only use information from actual files in this project — never invent code or configs
@@ -23,8 +20,6 @@
 - Always add `set -euo pipefail` in bash scripts
 - Always add login check at the start of scripts (`az account show` / `gh auth status`)
 - Always add a `--dry-run` flag to any bulk-operation script
-- Scripts must be idempotent — safe to re-run without side effects
-- Always log output to a report file for audit
 
 ## Azure AD Rules
 - All groups follow naming convention
