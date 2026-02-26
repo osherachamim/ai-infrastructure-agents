@@ -122,7 +122,7 @@ Repository Permissions (Write)
 
 ---
 
-## Phase 1 — Azure AD Dynamic Groups ✅
+## Phase 1 — Azure AD Dynamic Groups 
 
 ### What Was Done
 Created Azure AD mail-disabled security groups** using a Python script that reads from a CSV file and calls the Microsoft Graph API.
