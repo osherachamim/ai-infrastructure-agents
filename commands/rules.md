@@ -1,10 +1,10 @@
 # Project Rules
 
 ## ⚠️ Production Safety Rules
-- This is a PRODUCTION environment — Azure AD and GitHub `cato-networks-IT` org are live
+- This is a PRODUCTION environment — Azure AD and GitHub org are live
 - Always run `--dry-run` first before any real execution
 - Always run `az account show` to verify the correct Azure tenant before any `az` command
-- Always run `gh auth status` to verify `cato-networks-IT` org before any `gh` command
+- Always run `gh auth status` to verify org before any `gh` command
 - Never bulk-delete resources — delete one at a time and verify
 - Test new scripts on 1 resource first before running on all
 - Never rename GitHub repos without confirming it won't break developer workflows
@@ -27,15 +27,13 @@
 - Always log output to a report file for audit
 
 ## Azure AD Rules
-- All groups follow naming convention: `AG-GitHub-W-<reponame>`
-- Groups must be mail-disabled security groups (`--mail-enabled false --security-enabled true`)
+- All groups follow naming convention
+- Groups must be mail-disabled security groups
 - Dynamic membership requires Azure AD Premium P1 or P2
 - Use `az login --use-device-code` for corporate proxy environments
 - Always verify group was created with `az ad group show` after creation
 
 ## GitHub Rules
-- Organization: `cato-networks-IT`
-- Repos migrated from Azure DevOps — renamed with `AgenticAi_` prefix
 - Teams must be linked to Azure AD IDP groups for SCIM sync
-- Default repo permission for `AG-GitHub-W-*` groups is `push` (Write)
+- Default repo permission for  groups is `push` (Write)
 - Use `gh api` for team and IDP group operations (not supported by `gh team` directly)
