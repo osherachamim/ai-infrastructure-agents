@@ -1,9 +1,5 @@
 # Documentation References — Azure AD & GitHub CLI
-
-> ⚠️ **PRODUCTION ENVIRONMENT**
 > This project manages live Azure AD groups and a GitHub EMU organization.
-> Always run `--dry-run` first. Never run destructive commands without verifying scope.
-> When in doubt — stop and ask.
 
 ---
 
