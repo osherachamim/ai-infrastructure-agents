@@ -10,6 +10,158 @@
 This project automates the full lifecycle of GitHub organization access management using **Azure AD as the Identity Provider (IDP)**. Instead of managing GitHub access manually, this automation bridges Azure AD dynamic groups with GitHub EMU teams and repository permissions — ensuring access follows the same rules as the organization's identity management.
 
 ---
+## AI-Assisted Development Setup (Cursor IDE)
+
+This project is built with **Cursor IDE** and uses a structured set of AI context files to make the AI agent aware of the full infrastructure, rules, and project state across every session.
+
+---
+
+### `.cursor/commands/` — AI Context Files
+
+These markdown files are loaded by the AI at the start of each session using slash commands (e.g. `/context`, `/rules`). They eliminate the need to re-explain the project every time.
+
+#### `context.md` — Project Overview
+Describes the full project: what it does, why it exists, all 4 phases, key files, and infrastructure details.
+
+**Use it:** `/context` — loads full project understanding into the AI
+
+#### `docs.md` — Reference Documentation
+A curated reference of all Azure AD and GitHub CLI commands used in this project, including:
+- Corporate SSL fix (Cato SSL inspection)
+- `az ad group` commands
+- `az rest` Graph API calls
+- `gh` CLI commands for teams, IDP sync, repo permissions
+- Production safety rules
+
+**Use it:** `/docs` — gives the AI the correct CLI syntax without guessing
+
+#### `rules.md` — Production Safety Rules
+Strict rules the AI must follow when working on this project:
+- Always dry-run before real execution
+- Always verify Azure tenant and GitHub org before running
+- Never bulk-delete
+- Test on 1 resource before running on all
+- Require explicit `YES` / `--confirm` approval before PRODUCTION runs
+- Keep all reports for audit
+
+**Use it:** `/rules` — ensures the AI behaves safely on a live production system
+
+#### `memory.md` — Infrastructure Knowledge
+Everything the AI needs to know about the environment without being told each session:
+- Role: Infrastructure & Cloud Engineer at Cato Networks
+- Azure AD extensionAttributes (`ext4`, `ext6`, `ext7`) and their meaning
+- Cato SASE SSL inspection and how to fix it for CLI tools
+- GitHub EMU — users are IDP-managed, not manually addable
+- Device management (Jamf/Intune), automation tools (Workato/UIPath)
+- Current project progress and which groups have been created
+
+**Use it:** `/memory` — loads full infrastructure context into the AI
+
+---
+
+### `.cursor/skills/azure-dynamic-groups/` — AI Skill
+
+Skills are specialized instruction files that teach the AI how to perform a specific task. This skill covers everything needed to work with Azure AD dynamic groups in this project.
+
+#### `SKILL.md` — Azure Dynamic Groups Skill
+
+Activated with `/azure-dynamic-groups <instruction>`.
+
+**What it teaches the AI:**
+- Prerequisites (az login, Cato SSL fix, Python)
+- Correct Graph API commands (NOT `az ad group create` which lacks `--mail-enabled` support)
+- Where the production script lives and how to run it
+- CSV format and column definitions
+- Common membership rule syntax examples
+- Error handling tips (403, already exists, P1/P2 requirement)
+
+**Example usage:**
+```
+/azure-dynamic-groups run dry run
+/azure-dynamic-groups run the real script
+/azure-dynamic-groups add 5 new groups to the CSV
+/azure-dynamic-groups the script failed with error X, help me debug
+```
+
+---
+
+### How It All Works Together
+
+```
+New chat session
+      │
+      ▼
+/memory    → AI knows your infrastructure, Cato SSL, extensionAttributes
+/rules     → AI follows production safety rules
+/context   → AI knows all 4 phases and current progress
+      │
+      ▼
+/azure-dynamic-groups run the real script
+      │
+      ▼
+AI reads SKILL.md → knows exact commands, script path, CSV format
+      │
+      ▼
+Shows pre-run verification → waits for YES → runs → shows results
+```
+
+This setup means you never have to explain the project twice. Every session starts with full context.
+
+---
+
+## File Structure
+
+```
+Azure-GitHub-Sync/
+├── README.md                          ← This file
+├── .cursor/
+│   ├── commands/
+│   │   ├── context.md                 ← Full project context & phase overview
+│   │   ├── docs.md                    ← Azure AD + GitHub CLI reference docs
+│   │   ├── rules.md                   ← Production safety rules for AI
+│   │   └── memory.md                  ← Infrastructure knowledge & progress
+│   └── skills/
+│       └── azure-dynamic-groups/
+│           └── SKILL.md               ← AI skill for Azure dynamic groups
+│
+├── Azure Cloud Shell/
+│   └── create groups/
+│       ├── create-AG-Git-.sh          ← Main script (Python)
+│       ├── azure.csv                  ← 288 groups source data
+│       ├── test-1group.csv            ← Single group test file
+│       └── reports/                   ← Auto-generated run reports
+│
+└── Github Migration/
+    ├── migrate_repo_bulk.sh           ← ADO → GitHub migration
+    ├── migrate-new-repo-bulk.sh       ← New repo migration variant
+    ├── rename-repos.sh                ← Add AgenticAi_ prefix
+    └── ...
+```
+
+---
+
+## Quick Start
+
+```bash
+# 1. Clone / open workspace
+cd "Azure-GitHub-Sync"
+
+# 2. Login to Azure
+az login --use-device-code
+
+# 3. Dry run — verify all 288 groups
+cd "Azure Cloud Shell/create groups"
+python3 -u create-AG-Git-.sh azure.csv --dry-run
+
+# 4. Real run
+python3 -u create-AG-Git-.sh azure.csv --confirm
+
+# 5. Check report
+open "reports/groups_report_$(ls reports/ | tail -1)"
+```
+
+---
+---
 
 ## Problem Statement
 
@@ -292,157 +444,7 @@ echo 'export SSL_CERT_FILE=/tmp/combined-ca-bundle.pem' >> ~/.zshrc
 
 ---
 
-## AI-Assisted Development Setup (Cursor IDE)
 
-This project is built with **Cursor IDE** and uses a structured set of AI context files to make the AI agent aware of the full infrastructure, rules, and project state across every session.
-
----
-
-### `.cursor/commands/` — AI Context Files
-
-These markdown files are loaded by the AI at the start of each session using slash commands (e.g. `/context`, `/rules`). They eliminate the need to re-explain the project every time.
-
-#### `context.md` — Project Overview
-Describes the full project: what it does, why it exists, all 4 phases, key files, and infrastructure details.
-
-**Use it:** `/context` — loads full project understanding into the AI
-
-#### `docs.md` — Reference Documentation
-A curated reference of all Azure AD and GitHub CLI commands used in this project, including:
-- Corporate SSL fix (Cato SSL inspection)
-- `az ad group` commands
-- `az rest` Graph API calls
-- `gh` CLI commands for teams, IDP sync, repo permissions
-- Production safety rules
-
-**Use it:** `/docs` — gives the AI the correct CLI syntax without guessing
-
-#### `rules.md` — Production Safety Rules
-Strict rules the AI must follow when working on this project:
-- Always dry-run before real execution
-- Always verify Azure tenant and GitHub org before running
-- Never bulk-delete
-- Test on 1 resource before running on all
-- Require explicit `YES` / `--confirm` approval before PRODUCTION runs
-- Keep all reports for audit
-
-**Use it:** `/rules` — ensures the AI behaves safely on a live production system
-
-#### `memory.md` — Infrastructure Knowledge
-Everything the AI needs to know about the environment without being told each session:
-- Role: Infrastructure & Cloud Engineer at Cato Networks
-- Azure AD extensionAttributes (`ext4`, `ext6`, `ext7`) and their meaning
-- Cato SASE SSL inspection and how to fix it for CLI tools
-- GitHub EMU — users are IDP-managed, not manually addable
-- Device management (Jamf/Intune), automation tools (Workato/UIPath)
-- Current project progress and which groups have been created
-
-**Use it:** `/memory` — loads full infrastructure context into the AI
-
----
-
-### `.cursor/skills/azure-dynamic-groups/` — AI Skill
-
-Skills are specialized instruction files that teach the AI how to perform a specific task. This skill covers everything needed to work with Azure AD dynamic groups in this project.
-
-#### `SKILL.md` — Azure Dynamic Groups Skill
-
-Activated with `/azure-dynamic-groups <instruction>`.
-
-**What it teaches the AI:**
-- Prerequisites (az login, Cato SSL fix, Python)
-- Correct Graph API commands (NOT `az ad group create` which lacks `--mail-enabled` support)
-- Where the production script lives and how to run it
-- CSV format and column definitions
-- Common membership rule syntax examples
-- Error handling tips (403, already exists, P1/P2 requirement)
-
-**Example usage:**
-```
-/azure-dynamic-groups run dry run
-/azure-dynamic-groups run the real script
-/azure-dynamic-groups add 5 new groups to the CSV
-/azure-dynamic-groups the script failed with error X, help me debug
-```
-
----
-
-### How It All Works Together
-
-```
-New chat session
-      │
-      ▼
-/memory    → AI knows your infrastructure, Cato SSL, extensionAttributes
-/rules     → AI follows production safety rules
-/context   → AI knows all 4 phases and current progress
-      │
-      ▼
-/azure-dynamic-groups run the real script
-      │
-      ▼
-AI reads SKILL.md → knows exact commands, script path, CSV format
-      │
-      ▼
-Shows pre-run verification → waits for YES → runs → shows results
-```
-
-This setup means you never have to explain the project twice. Every session starts with full context.
-
----
-
-## File Structure
-
-```
-Azure-GitHub-Sync/
-├── README.md                          ← This file
-├── .cursor/
-│   ├── commands/
-│   │   ├── context.md                 ← Full project context & phase overview
-│   │   ├── docs.md                    ← Azure AD + GitHub CLI reference docs
-│   │   ├── rules.md                   ← Production safety rules for AI
-│   │   └── memory.md                  ← Infrastructure knowledge & progress
-│   └── skills/
-│       └── azure-dynamic-groups/
-│           └── SKILL.md               ← AI skill for Azure dynamic groups
-│
-├── Azure Cloud Shell/
-│   └── create groups/
-│       ├── create-AG-Git-.sh          ← Main script (Python)
-│       ├── azure.csv                  ← 288 groups source data
-│       ├── test-1group.csv            ← Single group test file
-│       └── reports/                   ← Auto-generated run reports
-│
-└── Github Migration/
-    ├── migrate_repo_bulk.sh           ← ADO → GitHub migration
-    ├── migrate-new-repo-bulk.sh       ← New repo migration variant
-    ├── rename-repos.sh                ← Add AgenticAi_ prefix
-    └── ...
-```
-
----
-
-## Quick Start
-
-```bash
-# 1. Clone / open workspace
-cd "Azure-GitHub-Sync"
-
-# 2. Login to Azure
-az login --use-device-code
-
-# 3. Dry run — verify all 288 groups
-cd "Azure Cloud Shell/create groups"
-python3 -u create-AG-Git-.sh azure.csv --dry-run
-
-# 4. Real run
-python3 -u create-AG-Git-.sh azure.csv --confirm
-
-# 5. Check report
-open "reports/groups_report_$(ls reports/ | tail -1)"
-```
-
----
 
 ## Run History
 
