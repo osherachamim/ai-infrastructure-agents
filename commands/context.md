@@ -49,17 +49,6 @@ Azure AD Dynamic Groups
 
 ## Key Files
 
-
-## Infrastructure
-
-| Component | Value |
-|---|---|
-| Azure AD Tenant
-| GitHub Organization
-| GitHub Type | Enterprise Managed Users (EMU) |
-| Auth to Azure | `az login` (device code for corporate proxy) |
-| Auth to GitHub | `gh` CLI with PAT (`GH_PAT`) |
-
 ## Important Notes
 - Corporate proxy uses self-signed certificate → use `az login --use-device-code`
 - All Azure AD groups are **mail-disabled security groups**
