@@ -1,0 +1,41 @@
+# Project Rules
+
+## ⚠️ Production Safety Rules
+- This is a PRODUCTION environment — Azure AD and GitHub `cato-networks-IT` org are live
+- Always run `--dry-run` first before any real execution
+- Always run `az account show` to verify the correct Azure tenant before any `az` command
+- Always run `gh auth status` to verify `cato-networks-IT` org before any `gh` command
+- Never bulk-delete resources — delete one at a time and verify
+- Test new scripts on 1 resource first before running on all
+- Never rename GitHub repos without confirming it won't break developer workflows
+- Keep all report CSVs in `reports/` folder for audit trail
+
+## AI Behavior Rules
+- Only use information from actual files in this project — never invent code or configs
+- Always read the file before editing it
+- Verify file paths exist before referencing them
+- When unsure — ask, don't guess
+- Base all suggestions on existing patterns in the codebase
+- State clearly when something is not found rather than making it up
+
+## Scripting Rules
+- Never hardcode secrets, tokens, or passwords — use environment variables
+- Always add `set -euo pipefail` in bash scripts
+- Always add login check at the start of scripts (`az account show` / `gh auth status`)
+- Always add a `--dry-run` flag to any bulk-operation script
+- Scripts must be idempotent — safe to re-run without side effects
+- Always log output to a report file for audit
+
+## Azure AD Rules
+- All groups follow naming convention: `AG-GitHub-W-<reponame>`
+- Groups must be mail-disabled security groups (`--mail-enabled false --security-enabled true`)
+- Dynamic membership requires Azure AD Premium P1 or P2
+- Use `az login --use-device-code` for corporate proxy environments
+- Always verify group was created with `az ad group show` after creation
+
+## GitHub Rules
+- Organization: `cato-networks-IT`
+- Repos migrated from Azure DevOps — renamed with `AgenticAi_` prefix
+- Teams must be linked to Azure AD IDP groups for SCIM sync
+- Default repo permission for `AG-GitHub-W-*` groups is `push` (Write)
+- Use `gh api` for team and IDP group operations (not supported by `gh team` directly)
