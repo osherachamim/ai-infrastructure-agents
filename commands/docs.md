@@ -16,7 +16,6 @@
 - [Dynamic Group Rule Syntax](https://learn.microsoft.com/en-us/azure/active-directory/enterprise-users/groups-dynamic-membership#supported-operators)
 - [extensionAttribute Reference](https://learn.microsoft.com/en-us/azure/active-directory/enterprise-users/groups-dynamic-membership#extension-attributes-and-custom-extension-properties)
 
-> The `create-AG-Git-.sh` script builds the combined bundle automatically at startup.
 
 ### Key CLI Commands
 
@@ -52,18 +51,6 @@ az rest --method PATCH \
 az rest --method GET \
   --uri "https://graph.microsoft.com/v1.0/groups/<object-id>?$select=displayName,membershipRule,membershipRuleProcessingState"
 ```
-
-### Membership Rule Attributes Used in This Project
-
-| Attribute | Values Used | Purpose |
-|---|---|---|
-| `user.userType` | `Member` | Exclude guest users |
-| `user.accountEnabled` | `true` | Active users only |
-| `user.department` | `ne null` | Must have a department |
-| `user.mail` | `ne null` | Must have an email |
-| `user.extensionAttribute4` | Employment type + Team | Auto-membership rule |
-| `user.extensionAttribute6` | `eq null` | Exclude offboarded users |
-| `user.extensionAttribute7` | Group name | Manual override per user |
 
 ---
 
