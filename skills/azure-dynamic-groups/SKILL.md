@@ -1,6 +1,6 @@
 ---
 name: azure-dynamic-groups
-description: Create Azure AD dynamic groups using bash and az CLI. Handles reading group definitions from Excel or CSV files, building membership rules, and bulk-creating groups via az CLI. Use when the user asks about Azure dynamic groups, AAD groups, creating groups from Excel/spreadsheet data, or Azure Cloud Shell group scripts.
+description: Create Azure AD dynamic groups using bash and az CLI. Handles reading group definitions from Excel or CSV files, building membership rules, and bulk-creating groups via az CLI. Use when the user asks about Azure dynamic groups, AAD groups, creating groups from Excel/spreadsheet data.
 ---
 
 # Azure Dynamic Groups via CursorAI Agent
